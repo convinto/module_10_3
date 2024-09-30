@@ -10,41 +10,23 @@ class Bank:
     def deposit(self):
         for i in range(100):
             sum_log = randint(50, 500)
-            with self.lock:
-                if self.balance <= 500 and self.lock.locked():
-                    self.balance = self.balance + sum_log
-                    print(f'Пополнение: {sum_log}. Баланс: {self.balance}.')
+            self.balance = self.balance + sum_log
+            print(f'Пополнение: {sum_log}. Баланс: {self.balance}.')
+            if self.balance >= 500 and self.lock.locked():
+                self.lock.release()
             sleep(0.001)
 
-# Попытался реализовать блокировку потока методом acquire
     def take(self):
         for i in range(100):
-            self.lock.acquire()
             sum_log = randint(50, 500)
             print(f'Запрос на {sum_log}.')
-            #self.lock.acquire()
             if self.balance >= sum_log:
                 self.balance = self.balance - sum_log
                 print(f'Снятие: {sum_log}. Баланс: {self.balance}.')
             else:
                 print(f'Запрос отклонен, недостаточно средств.')
-            self.lock.release()
+                self.lock.acquire()
             sleep(0.001)
-
-
-# Вариант с with
-    # def take(self):
-    #     for i in range(100):
-    #         sum_log = randint(50, 500)
-    #         print(f'Запрос на {sum_log}.')
-    #         with self.lock:
-    #             if self.balance >= sum_log:
-    #                 self.balance = self.balance - sum_log
-    #                 print(f'Снятие: {sum_log}. Баланс: {self.balance}.')
-    #             else:
-    #                 print(f'Запрос отклонен, недостаточно средств.')
-    #         sleep(0.001)
-
 
 
 bk = Bank()
